@@ -1,0 +1,41 @@
+Pada program ini arduino 2 berperan sebagai server yang menerima data dari arduino 1 (client)
+
+Berikut adalah program nya
+
+#include <SPI.h>
+#include <Ethernet.h>
+
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
+
+IPAddress ip(192, 168, 1, 178);
+
+// Membuka akses port 23 untuk protokol TCP
+EthernetServer server(7000);
+
+int pinLed = 9;
+
+void setup() {
+  Ethernet.begin(mac, ip);
+  // Membuka koneksi dan menunggu koneksi dari client
+  server.begin();
+  Serial.begin(9600);
+  pinMode (9, OUTPUT);
+}
+
+void loop() {
+  // Cek jika ada data yang dikirim client
+  EthernetClient client = server.available();
+  if (client) {
+    while (client.available() > 0) {
+      int c = client.read();
+      
+      //Serial.write(thisChar);
+
+      int lampu = map(c,0,1023, 0, 255);
+
+     analogWrite(pinLed, lampu);
+    }
+  }
+}
